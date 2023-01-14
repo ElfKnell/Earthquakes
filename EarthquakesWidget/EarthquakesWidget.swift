@@ -17,35 +17,35 @@ struct Provider: TimelineProvider {
 
     func getSnapshot(in context: Context, completion: @escaping (SimpleEntry) -> ()) {
         Task {
+            var quakes = [Quake.preview]
+            
             do {
-                let quakes = try await providerQuake.quakes
-                
-                let entry = SimpleEntry(date: Date(), quakes: quakes)
-                completion(entry)
+                quakes = try await providerQuake.quakes
             } catch {
-                let entry = SimpleEntry(date: Date(), quakes: [Quake.preview])
-                completion(entry)
+                print(error.localizedDescription)
             }
+            
+            let entry = SimpleEntry(date: Date(), quakes: quakes)
+            completion(entry)
         }
     }
 
     func getTimeline(in context: Context, completion: @escaping (Timeline<Entry>) -> ()) {
         
         Task {
+            var quakes = [Quake.preview]
+            
             do {
-                let quakes = try await providerQuake.quakes
-                
-                let entries = SimpleEntry(date: .now, quakes: quakes)
-                
-                let timeline = Timeline(entries: [entries], policy: .after(.now.advanced(by: 60 * 60 * 30)))
-                
-                completion(timeline)
+                quakes = try await providerQuake.quakes
             } catch {
-                let entries = SimpleEntry(date: .now, quakes: [Quake.preview])
-                
-                let timeline = Timeline(entries: [entries], policy: .after(.now.advanced(by: 60 * 60 * 30)))
-                completion(timeline)
+                print(error.localizedDescription)
             }
+            
+            let entries = SimpleEntry(date: .now, quakes: quakes)
+            
+            let timeline = Timeline(entries: [entries], policy: .after(.now.advanced(by: 60 * 60 * 60)))
+            
+            completion(timeline)
         }
     }
 }
